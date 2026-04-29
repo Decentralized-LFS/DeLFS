@@ -1,0 +1,15 @@
+; fio-seq-write.job for fiotest
+
+[global]
+directory=/mnt/test
+rw=randwrite
+bs=4K
+direct=0
+numjobs=128
+;numjobs=48
+group_reporting
+
+[file1]
+size=218M
+;size=536M
+

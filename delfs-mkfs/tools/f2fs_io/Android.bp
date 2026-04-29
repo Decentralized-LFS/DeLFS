@@ -1,0 +1,15 @@
+cc_defaults {
+    name: "delfs-io-defaults",
+    cflags: [
+        "-Wno-unused-function"
+    ],
+}
+
+cc_binary {
+    name: "delfs_io",
+    defaults: [ "delfs-io-defaults" ],
+    srcs: [
+        "delfs_io.c",
+    ],
+    product_specific: true,
+}

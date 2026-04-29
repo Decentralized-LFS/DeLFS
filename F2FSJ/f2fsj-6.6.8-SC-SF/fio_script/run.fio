@@ -1,0 +1,16 @@
+; -- start job file --
+[global]
+name=fio-rand-write
+directory=/mnt/test
+;filename=fio-rand-write
+rw=write
+bs=4K
+direct=0
+numjobs=1
+;verify=meta
+
+[file1]
+size=1G
+;ioengine=libaio
+group_reporting
+; -- end job file --

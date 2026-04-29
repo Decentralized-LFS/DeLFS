@@ -1,0 +1,59 @@
+# temporary/editor files
+.*
+*~
+*.orig
+*.rej
+
+# object/library/binary files
+*.[ao]
+*.lo
+*.la
+*.so
+*.so.dbg
+*.mod.c
+*.lst
+*.s
+
+# archives
+*.tar.*
+
+# tags / db files
+CVS
+tags
+TAGS
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+cscope.*
+ncscope.*
+
+# generated autotools files
+aclocal.m4
+autom4te.cache/
+build-aux/compile
+build-aux/install-sh
+build-aux/missing
+build-aux/depcomp
+INSTALL
+Makefile
+Makefile.in
+config.h
+config.h.in
+config.log
+config.status
+configure
+libtool
+stamp-h
+stamp-h1
+
+# built binaries
+/mkfs/mkfs.f2fs
+/fsck/fsck.f2fs
+/tools/fibmap.f2fs
+/tools/parse.f2fs
+/tools/f2fscrypt
+/tools/f2fs_io/f2fs_io
+
+# keep gitignore itself
+!.gitignore

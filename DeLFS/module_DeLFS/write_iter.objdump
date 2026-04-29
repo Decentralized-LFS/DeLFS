@@ -1,0 +1,622 @@
+00000000000082a0 <f3fs_file_write_iter>:
+{
+    82a0:	f3 0f 1e fa          	endbr64 
+    82a4:	e8 00 00 00 00       	call   82a9 <f3fs_file_write_iter+0x9>
+    82a9:	55                   	push   %rbp
+    82aa:	48 89 e5             	mov    %rsp,%rbp
+    82ad:	41 57                	push   %r15
+    82af:	41 56                	push   %r14
+    82b1:	41 55                	push   %r13
+    82b3:	41 54                	push   %r12
+    82b5:	53                   	push   %rbx
+    82b6:	48 89 fb             	mov    %rdi,%rbx
+    82b9:	48 81 ec a0 00 00 00 	sub    $0xa0,%rsp
+	return f->f_inode;
+    82c0:	65 48 8b 04 25 28 00 	mov    %gs:0x28,%rax
+    82c7:	00 00 
+    82c9:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
+    82cd:	48 8b 07             	mov    (%rdi),%rax
+    82d0:	4c 8b b8 a8 00 00 00 	mov    0xa8(%rax),%r15
+	const loff_t orig_pos = iocb->ki_pos;
+    82d7:	48 8b 47 08          	mov    0x8(%rdi),%rax
+    82db:	48 89 45 98          	mov    %rax,-0x68(%rbp)
+    82df:	48 8b 46 18          	mov    0x18(%rsi),%rax
+    82e3:	48 89 45 90          	mov    %rax,-0x70(%rbp)
+	return sb->s_fs_info;
+    82e7:	49 8b 47 28          	mov    0x28(%r15),%rax
+	return (struct f3fs_checkpoint *)(sbi->ckpt);
+    82eb:	48 8b 80 80 03 00 00 	mov    0x380(%rax),%rax
+	unsigned int ckpt_flags = le32_to_cpu(cp->ckpt_flags);
+    82f2:	48 8b 80 00 01 00 00 	mov    0x100(%rax),%rax
+	if (unlikely(f3fs_cp_error(F3FS_I_SB(inode)))) {
+    82f9:	f6 40 24 08          	testb  $0x8,0x24(%rax)
+    82fd:	0f 85 dc 04 00 00    	jne    87df <f3fs_file_write_iter+0x53f>
+	return S_ISREG(inode->i_mode) &&
+    8303:	41 0f b7 07          	movzwl (%r15),%eax
+    8307:	49 89 f5             	mov    %rsi,%r13
+    830a:	66 25 00 f0          	and    $0xf000,%ax
+    830e:	66 3d 00 80          	cmp    $0x8000,%ax
+    8312:	0f 84 79 02 00 00    	je     8591 <f3fs_file_write_iter+0x2f1>
+	return down_write_trylock(&inode->i_rwsem);
+    8318:	49 8d bf a0 00 00 00 	lea    0xa0(%r15),%rdi
+    831f:	48 89 7d 88          	mov    %rdi,-0x78(%rbp)
+	if (iocb->ki_flags & IOCB_NOWAIT) {
+    8323:	f6 43 20 08          	testb  $0x8,0x20(%rbx)
+    8327:	0f 84 dc 02 00 00    	je     8609 <f3fs_file_write_iter+0x369>
+    832d:	e8 00 00 00 00       	call   8332 <f3fs_file_write_iter+0x92>
+		if (!inode_trylock(inode)) {
+    8332:	85 c0                	test   %eax,%eax
+    8334:	0f 84 f2 04 00 00    	je     882c <f3fs_file_write_iter+0x58c>
+	struct file *file = iocb->ki_filp;
+    833a:	4c 8b 03             	mov    (%rbx),%r8
+	return f->f_inode;
+    833d:	49 8b 80 a8 00 00 00 	mov    0xa8(%r8),%rax
+    8344:	4c 89 45 80          	mov    %r8,-0x80(%rbp)
+	if (IS_IMMUTABLE(inode))
+    8348:	8b 48 0c             	mov    0xc(%rax),%ecx
+    834b:	83 e1 08             	and    $0x8,%ecx
+    834e:	89 8d 68 ff ff ff    	mov    %ecx,-0x98(%rbp)
+    8354:	0f 85 fd 0a 00 00    	jne    8e57 <f3fs_file_write_iter+0xbb7>
+		(addr[nr >> _BITOPS_LONG_SHIFT])) != 0;
+    835a:	4c 8b b0 98 02 00 00 	mov    0x298(%rax),%r14
+    8361:	49 c1 ee 21          	shr    $0x21,%r14
+	if (is_inode_flag_set(inode, FI_COMPRESS_RELEASED))
+    8365:	41 83 e6 01          	and    $0x1,%r14d
+    8369:	0f 85 19 0a 00 00    	jne    8d88 <f3fs_file_write_iter+0xae8>
+	count = generic_write_checks(iocb, from);
+    836f:	4c 89 ee             	mov    %r13,%rsi
+    8372:	48 89 df             	mov    %rbx,%rdi
+    8375:	e8 00 00 00 00       	call   837a <f3fs_file_write_iter+0xda>
+	bool may_need_sync = true;
+    837a:	41 bb 01 00 00 00    	mov    $0x1,%r11d
+	count = generic_write_checks(iocb, from);
+    8380:	49 89 c4             	mov    %rax,%r12
+	if (count <= 0)
+    8383:	48 85 c0             	test   %rax,%rax
+    8386:	0f 8e c2 03 00 00    	jle    874e <f3fs_file_write_iter+0x4ae>
+	err = file_modified(file);
+    838c:	48 8b 7d 80          	mov    -0x80(%rbp),%rdi
+    8390:	44 88 9d 7c ff ff ff 	mov    %r11b,-0x84(%rbp)
+    8397:	e8 00 00 00 00       	call   839c <f3fs_file_write_iter+0xfc>
+	if (err)
+    839c:	44 0f b6 9d 7c ff ff 	movzbl -0x84(%rbp),%r11d
+    83a3:	ff 
+    83a4:	85 c0                	test   %eax,%eax
+    83a6:	0f 85 6f 04 00 00    	jne    881b <f3fs_file_write_iter+0x57b>
+	dio = f3fs_should_use_dio(inode, iocb, from);
+    83ac:	4c 89 ea             	mov    %r13,%rdx
+    83af:	48 89 de             	mov    %rbx,%rsi
+    83b2:	4c 89 ff             	mov    %r15,%rdi
+    83b5:	e8 36 c7 ff ff       	call   4af0 <f3fs_should_use_dio>
+	struct inode *inode = file_inode(iocb->ki_filp);
+    83ba:	4c 8b 13             	mov    (%rbx),%r10
+	target_size = iocb->ki_pos + iov_iter_count(from);
+    83bd:	4c 8b 63 08          	mov    0x8(%rbx),%r12
+	struct f3fs_map_blocks map = {};
+    83c1:	4c 8d 45 a0          	lea    -0x60(%rbp),%r8
+    83c5:	49 8b 75 18          	mov    0x18(%r13),%rsi
+	dio = f3fs_should_use_dio(inode, iocb, from);
+    83c9:	88 45 80             	mov    %al,-0x80(%rbp)
+    83cc:	41 89 c1             	mov    %eax,%r9d
+	struct f3fs_map_blocks map = {};
+    83cf:	b9 06 00 00 00       	mov    $0x6,%ecx
+    83d4:	4d 8b b2 a8 00 00 00 	mov    0xa8(%r10),%r14
+    83db:	4c 89 c7             	mov    %r8,%rdi
+	target_size = iocb->ki_pos + iov_iter_count(from);
+    83de:	49 8d 04 34          	lea    (%r12,%rsi,1),%rax
+    83e2:	48 89 85 70 ff ff ff 	mov    %rax,-0x90(%rbp)
+	return sb->s_fs_info;
+    83e9:	49 8b 46 28          	mov    0x28(%r14),%rax
+    83ed:	48 8b 90 80 03 00 00 	mov    0x380(%rax),%rdx
+	struct f3fs_map_blocks map = {};
+    83f4:	31 c0                	xor    %eax,%eax
+    83f6:	f3 48 ab             	rep stos %rax,%es:(%rdi)
+	if (dio && f3fs_lfs_mode(sbi))
+    83f9:	45 84 c9             	test   %r9b,%r9b
+    83fc:	74 1a                	je     8418 <f3fs_file_write_iter+0x178>
+    83fe:	83 ba 5c 06 00 00 01 	cmpl   $0x1,0x65c(%rdx)
+    8405:	0f 84 83 02 00 00    	je     868e <f3fs_file_write_iter+0x3ee>
+	return inode->i_size;
+    840b:	49 8b 46 50          	mov    0x50(%r14),%rax
+	if (dio && i_size_read(inode) &&
+    840f:	48 85 c0             	test   %rax,%rax
+    8412:	0f 85 5c 02 00 00    	jne    8674 <f3fs_file_write_iter+0x3d4>
+	if (iocb->ki_flags & IOCB_NOWAIT)
+    8418:	8b 43 20             	mov    0x20(%rbx),%eax
+    841b:	83 e0 08             	and    $0x8,%eax
+    841e:	89 85 7c ff ff ff    	mov    %eax,-0x84(%rbp)
+    8424:	0f 85 64 02 00 00    	jne    868e <f3fs_file_write_iter+0x3ee>
+	if (fault_in_iov_iter_readable(iter, count))
+    842a:	4c 89 ef             	mov    %r13,%rdi
+    842d:	e8 00 00 00 00       	call   8432 <f3fs_file_write_iter+0x192>
+    8432:	4c 8d 45 a0          	lea    -0x60(%rbp),%r8
+    8436:	48 85 c0             	test   %rax,%rax
+    8439:	0f 85 33 06 00 00    	jne    8a72 <f3fs_file_write_iter+0x7d2>
+    843f:	49 8b 86 98 02 00 00 	mov    0x298(%r14),%rax
+	if (f3fs_has_inline_data(inode)) {
+    8446:	f6 c4 04             	test   $0x4,%ah
+    8449:	74 42                	je     848d <f3fs_file_write_iter+0x1ed>
+	return F3FS_I(inode)->i_extra_isize / sizeof(__le32);
+    844b:	49 63 96 e0 03 00 00 	movslq 0x3e0(%r14),%rdx
+		if (pos + count <= MAX_INLINE_DATA(inode))
+    8452:	b8 9a 03 00 00       	mov    $0x39a,%eax
+    8457:	41 2b 86 e8 03 00 00 	sub    0x3e8(%r14),%eax
+    845e:	48 c1 ea 02          	shr    $0x2,%rdx
+    8462:	29 d0                	sub    %edx,%eax
+    8464:	48 98                	cltq   
+    8466:	48 c1 e0 02          	shl    $0x2,%rax
+    846a:	48 39 85 70 ff ff ff 	cmp    %rax,-0x90(%rbp)
+    8471:	0f 86 fb 05 00 00    	jbe    8a72 <f3fs_file_write_iter+0x7d2>
+		ret = f3fs_convert_inline_inode(inode);
+    8477:	4c 89 f7             	mov    %r14,%rdi
+    847a:	e8 00 00 00 00       	call   847f <f3fs_file_write_iter+0x1df>
+		if (ret)
+    847f:	4c 8d 45 a0          	lea    -0x60(%rbp),%r8
+    8483:	85 c0                	test   %eax,%eax
+		ret = f3fs_convert_inline_inode(inode);
+    8485:	89 85 7c ff ff ff    	mov    %eax,-0x84(%rbp)
+		if (ret)
+    848b:	75 74                	jne    8501 <f3fs_file_write_iter+0x261>
+	map.m_len = F3FS_BYTES_TO_BLK(pos + count);
+    848d:	48 8b 85 70 ff ff ff 	mov    -0x90(%rbp),%rax
+	map.m_lblk = F3FS_BLK_ALIGN(pos);
+    8494:	49 81 c4 ff 0f 00 00 	add    $0xfff,%r12
+	map.m_may_create = true;
+    849b:	c6 45 cc 01          	movb   $0x1,-0x34(%rbp)
+	map.m_lblk = F3FS_BLK_ALIGN(pos);
+    849f:	49 c1 fc 0c          	sar    $0xc,%r12
+	map.m_len = F3FS_BYTES_TO_BLK(pos + count);
+    84a3:	48 c1 e8 0c          	shr    $0xc,%rax
+	map.m_lblk = F3FS_BLK_ALIGN(pos);
+    84a7:	44 89 65 ac          	mov    %r12d,-0x54(%rbp)
+		map.m_len -= map.m_lblk;
+    84ab:	89 c2                	mov    %eax,%edx
+    84ad:	44 29 e2             	sub    %r12d,%edx
+    84b0:	41 39 c4             	cmp    %eax,%r12d
+    84b3:	0f 43 95 68 ff ff ff 	cmovae -0x98(%rbp),%edx
+	if (dio) {
+    84ba:	80 7d 80 00          	cmpb   $0x0,-0x80(%rbp)
+    84be:	b8 08 00 00 00       	mov    $0x8,%eax
+    84c3:	89 55 b0             	mov    %edx,-0x50(%rbp)
+		flag = F3FS_GET_BLOCK_PRE_AIO;
+    84c6:	ba 05 00 00 00       	mov    $0x5,%edx
+	if (dio) {
+    84cb:	0f 85 b8 07 00 00    	jne    8c89 <f3fs_file_write_iter+0x9e9>
+	ret = f3fs_map_blocks(inode, &map, flag);
+    84d1:	4c 89 c6             	mov    %r8,%rsi
+    84d4:	4c 89 f7             	mov    %r14,%rdi
+		map.m_seg_type = f3fs_rw_hint_to_seg_type(inode->i_write_hint);
+    84d7:	89 45 c8             	mov    %eax,-0x38(%rbp)
+	ret = f3fs_map_blocks(inode, &map, flag);
+    84da:	e8 00 00 00 00       	call   84df <f3fs_file_write_iter+0x23f>
+    84df:	89 85 7c ff ff ff    	mov    %eax,-0x84(%rbp)
+	if (ret < 0 && !((ret == -ENOSPC || ret == -EDQUOT) && map.m_len > 0))
+    84e5:	85 c0                	test   %eax,%eax
+    84e7:	0f 88 7e 07 00 00    	js     8c6b <f3fs_file_write_iter+0x9cb>
+	if (ret == 0)
+    84ed:	75 09                	jne    84f8 <f3fs_file_write_iter+0x258>
+		asm volatile(LOCK_PREFIX "orb %b1,%0"
+    84ef:	f0 41 80 8e 9a 02 00 	lock orb $0x80,0x29a(%r14)
+    84f6:	00 80 
+	return map.m_len;
+    84f8:	8b 45 b0             	mov    -0x50(%rbp),%eax
+    84fb:	89 85 7c ff ff ff    	mov    %eax,-0x84(%rbp)
+	if (preallocated < 0) {
+    8501:	8b 8d 7c ff ff ff    	mov    -0x84(%rbp),%ecx
+    8507:	85 c9                	test   %ecx,%ecx
+    8509:	0f 89 63 05 00 00    	jns    8a72 <f3fs_file_write_iter+0x7d2>
+		ret = preallocated;
+    850f:	4c 63 a5 7c ff ff ff 	movslq -0x84(%rbp),%r12
+	bool may_need_sync = true;
+    8516:	41 bb 01 00 00 00    	mov    $0x1,%r11d
+	if (preallocated && i_size_read(inode) < target_size) {
+    851c:	48 8b 85 70 ff ff ff 	mov    -0x90(%rbp),%rax
+    8523:	49 3b 47 50          	cmp    0x50(%r15),%rax
+    8527:	0f 8e e1 01 00 00    	jle    870e <f3fs_file_write_iter+0x46e>
+	down_write(&sem->internal_rwsem);
+    852d:	4d 8d af 90 03 00 00 	lea    0x390(%r15),%r13
+    8534:	44 88 9d 7c ff ff ff 	mov    %r11b,-0x84(%rbp)
+    853b:	4c 89 ef             	mov    %r13,%rdi
+    853e:	e8 00 00 00 00       	call   8543 <f3fs_file_write_iter+0x2a3>
+	down_write(&mapping->invalidate_lock);
+    8543:	49 8b 47 30          	mov    0x30(%r15),%rax
+    8547:	48 8d 78 18          	lea    0x18(%rax),%rdi
+    854b:	e8 00 00 00 00       	call   8550 <f3fs_file_write_iter+0x2b0>
+		if (!f3fs_truncate(inode))
+    8550:	4c 89 ff             	mov    %r15,%rdi
+    8553:	e8 00 00 00 00       	call   8558 <f3fs_file_write_iter+0x2b8>
+    8558:	44 0f b6 9d 7c ff ff 	movzbl -0x84(%rbp),%r11d
+    855f:	ff 
+    8560:	85 c0                	test   %eax,%eax
+    8562:	0f 84 cf 06 00 00    	je     8c37 <f3fs_file_write_iter+0x997>
+	up_write(&mapping->invalidate_lock);
+    8568:	49 8b 47 30          	mov    0x30(%r15),%rax
+    856c:	44 88 9d 7c ff ff ff 	mov    %r11b,-0x84(%rbp)
+    8573:	48 8d 78 18          	lea    0x18(%rax),%rdi
+    8577:	e8 00 00 00 00       	call   857c <f3fs_file_write_iter+0x2dc>
+	up_write(&sem->internal_rwsem);
+    857c:	4c 89 ef             	mov    %r13,%rdi
+    857f:	e8 00 00 00 00       	call   8584 <f3fs_file_write_iter+0x2e4>
+}
+    8584:	44 0f b6 9d 7c ff ff 	movzbl -0x84(%rbp),%r11d
+    858b:	ff 
+    858c:	e9 af 01 00 00       	jmp    8740 <f3fs_file_write_iter+0x4a0>
+		(addr[nr >> _BITOPS_LONG_SHIFT])) != 0;
+    8591:	4d 8b 9f 98 02 00 00 	mov    0x298(%r15),%r11
+    8598:	49 c1 eb 1d          	shr    $0x1d,%r11
+	return S_ISREG(inode->i_mode) &&
+    859c:	41 83 e3 01          	and    $0x1,%r11d
+    85a0:	0f 84 72 fd ff ff    	je     8318 <f3fs_file_write_iter+0x78>
+		ret = -EOPNOTSUPP;
+    85a6:	49 c7 c4 a1 ff ff ff 	mov    $0xffffffffffffffa1,%r12
+	bool dio = false;
+    85ad:	45 31 f6             	xor    %r14d,%r14d
+    85b0:	66 90                	xchg   %ax,%ax
+	if (ret > 0 && may_need_sync)
+    85b2:	4d 85 e4             	test   %r12,%r12
+    85b5:	7e 29                	jle    85e0 <f3fs_file_write_iter+0x340>
+    85b7:	41 80 fb 01          	cmp    $0x1,%r11b
+    85bb:	0f 87 00 00 00 00    	ja     85c1 <f3fs_file_write_iter+0x321>
+    85c1:	41 83 e3 01          	and    $0x1,%r11d
+    85c5:	0f 85 9a 01 00 00    	jne    8765 <f3fs_file_write_iter+0x4c5>
+	if (ret > 0 && !dio && (iocb->ki_flags & IOCB_DIRECT))
+    85cb:	4d 85 e4             	test   %r12,%r12
+    85ce:	7e 10                	jle    85e0 <f3fs_file_write_iter+0x340>
+    85d0:	41 80 fe 01          	cmp    $0x1,%r14b
+    85d4:	74 0a                	je     85e0 <f3fs_file_write_iter+0x340>
+    85d6:	f6 43 22 02          	testb  $0x2,0x22(%rbx)
+    85da:	0f 85 b8 01 00 00    	jne    8798 <f3fs_file_write_iter+0x4f8>
+}
+    85e0:	48 8b 45 d0          	mov    -0x30(%rbp),%rax
+    85e4:	65 48 2b 04 25 28 00 	sub    %gs:0x28,%rax
+    85eb:	00 00 
+    85ed:	0f 85 a2 08 00 00    	jne    8e95 <f3fs_file_write_iter+0xbf5>
+    85f3:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
+    85f7:	4c 89 e0             	mov    %r12,%rax
+    85fa:	5b                   	pop    %rbx
+    85fb:	41 5c                	pop    %r12
+    85fd:	41 5d                	pop    %r13
+    85ff:	41 5e                	pop    %r14
+    8601:	41 5f                	pop    %r15
+    8603:	5d                   	pop    %rbp
+    8604:	e9 00 00 00 00       	jmp    8609 <f3fs_file_write_iter+0x369>
+	down_write(&inode->i_rwsem);
+    8609:	48 8b 7d 88          	mov    -0x78(%rbp),%rdi
+    860d:	e8 00 00 00 00       	call   8612 <f3fs_file_write_iter+0x372>
+}
+    8612:	e9 23 fd ff ff       	jmp    833a <f3fs_file_write_iter+0x9a>
+TRACE_EVENT(f3fs_file_write_iter,
+    8617:	65 8b 05 00 00 00 00 	mov    %gs:0x0(%rip),%eax        # 861e <f3fs_file_write_iter+0x37e>
+					  variable_test_bit(nr, addr);
+    861e:	89 c0                	mov    %eax,%eax
+	asm volatile(__ASM_SIZE(bt) " %2,%1"
+    8620:	48 0f a3 05 00 00 00 	bt     %rax,0x0(%rip)        # 8628 <f3fs_file_write_iter+0x388>
+    8627:	00 
+    8628:	73 88                	jae    85b2 <f3fs_file_write_iter+0x312>
+	raw_cpu_add_4(pcpu_hot.preempt_count, val);
+    862a:	65 ff 05 00 00 00 00 	incl   %gs:0x0(%rip)        # 8631 <f3fs_file_write_iter+0x391>
+    8631:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 8638 <f3fs_file_write_iter+0x398>
+    8638:	48 85 c0             	test   %rax,%rax
+    863b:	74 20                	je     865d <f3fs_file_write_iter+0x3bd>
+    863d:	48 8b 78 08          	mov    0x8(%rax),%rdi
+    8641:	48 8b 4d 90          	mov    -0x70(%rbp),%rcx
+    8645:	4d 89 e0             	mov    %r12,%r8
+    8648:	4c 89 fe             	mov    %r15,%rsi
+    864b:	48 8b 55 98          	mov    -0x68(%rbp),%rdx
+    864f:	44 88 5d 88          	mov    %r11b,-0x78(%rbp)
+    8653:	e8 00 00 00 00       	call   8658 <f3fs_file_write_iter+0x3b8>
+    8658:	44 0f b6 5d 88       	movzbl -0x78(%rbp),%r11d
+	return GEN_UNARY_RMWcc("decl", pcpu_hot.preempt_count, e,
+    865d:	65 ff 0d 00 00 00 00 	decl   %gs:0x0(%rip)        # 8664 <f3fs_file_write_iter+0x3c4>
+    8664:	0f 85 48 ff ff ff    	jne    85b2 <f3fs_file_write_iter+0x312>
+    866a:	e8 00 00 00 00       	call   866f <f3fs_file_write_iter+0x3cf>
+    866f:	e9 3e ff ff ff       	jmp    85b2 <f3fs_file_write_iter+0x312>
+		(F3FS_BYTES_TO_BLK(pos) < F3FS_BLK_ALIGN(i_size_read(inode))))
+    8674:	4c 89 e2             	mov    %r12,%rdx
+    8677:	48 05 ff 0f 00 00    	add    $0xfff,%rax
+    867d:	48 c1 fa 0c          	sar    $0xc,%rdx
+    8681:	48 c1 f8 0c          	sar    $0xc,%rax
+	if (dio && i_size_read(inode) &&
+    8685:	48 39 c2             	cmp    %rax,%rdx
+    8688:	0f 8d 8a fd ff ff    	jge    8418 <f3fs_file_write_iter+0x178>
+		return 0;
+    868e:	c7 85 7c ff ff ff 00 	movl   $0x0,-0x84(%rbp)
+    8695:	00 00 00 
+    8698:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+			f3fs_dio_write_iter(iocb, from, &may_need_sync) :
+    869d:	80 7d 80 00          	cmpb   $0x0,-0x80(%rbp)
+	return f->f_inode;
+    86a1:	4d 8b b2 a8 00 00 00 	mov    0xa8(%r10),%r14
+    86a8:	0f 85 93 01 00 00    	jne    8841 <f3fs_file_write_iter+0x5a1>
+	if (iocb->ki_flags & IOCB_NOWAIT)
+    86ae:	f6 43 20 08          	testb  $0x8,0x20(%rbx)
+    86b2:	0f 85 cb 07 00 00    	jne    8e83 <f3fs_file_write_iter+0xbe3>
+	ret = df_generic_perform_write(iocb, from);
+    86b8:	4c 89 ee             	mov    %r13,%rsi
+    86bb:	48 89 df             	mov    %rbx,%rdi
+    86be:	e8 00 00 00 00       	call   86c3 <f3fs_file_write_iter+0x423>
+	bool may_need_sync = true;
+    86c3:	41 bb 01 00 00 00    	mov    $0x1,%r11d
+	ret = df_generic_perform_write(iocb, from);
+    86c9:	49 89 c4             	mov    %rax,%r12
+	if (ret > 0) {
+    86cc:	48 85 c0             	test   %rax,%rax
+    86cf:	7e 2a                	jle    86fb <f3fs_file_write_iter+0x45b>
+	return sb->s_fs_info;
+    86d1:	49 8b 46 28          	mov    0x28(%r14),%rax
+		f3fs_update_iostat(F3FS_I_SB(inode), inode,
+    86d5:	4c 89 e1             	mov    %r12,%rcx
+    86d8:	ba 01 00 00 00       	mov    $0x1,%edx
+    86dd:	4c 89 f6             	mov    %r14,%rsi
+    86e0:	44 88 9d 68 ff ff ff 	mov    %r11b,-0x98(%rbp)
+    86e7:	48 8b b8 80 03 00 00 	mov    0x380(%rax),%rdi
+    86ee:	e8 00 00 00 00       	call   86f3 <f3fs_file_write_iter+0x453>
+    86f3:	44 0f b6 9d 68 ff ff 	movzbl -0x98(%rbp),%r11d
+    86fa:	ff 
+    86fb:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+	if (preallocated && i_size_read(inode) < target_size) {
+    8700:	8b 85 7c ff ff ff    	mov    -0x84(%rbp),%eax
+    8706:	85 c0                	test   %eax,%eax
+    8708:	0f 85 0e fe ff ff    	jne    851c <f3fs_file_write_iter+0x27c>
+	return F3FS_I(inode)->i_advise & type;
+    870e:	41 0f b6 87 80 02 00 	movzbl 0x280(%r15),%eax
+    8715:	00 
+	if (!is_file(inode, type))
+    8716:	84 c0                	test   %al,%al
+    8718:	79 26                	jns    8740 <f3fs_file_write_iter+0x4a0>
+	F3FS_I(inode)->i_advise &= ~type;
+    871a:	83 e0 7f             	and    $0x7f,%eax
+	f3fs_mark_inode_dirty_sync(inode, true);
+    871d:	be 01 00 00 00       	mov    $0x1,%esi
+    8722:	4c 89 ff             	mov    %r15,%rdi
+    8725:	44 88 9d 7c ff ff ff 	mov    %r11b,-0x84(%rbp)
+	F3FS_I(inode)->i_advise &= ~type;
+    872c:	41 88 87 80 02 00 00 	mov    %al,0x280(%r15)
+	f3fs_mark_inode_dirty_sync(inode, true);
+    8733:	e8 00 00 00 00       	call   8738 <f3fs_file_write_iter+0x498>
+    8738:	44 0f b6 9d 7c ff ff 	movzbl -0x84(%rbp),%r11d
+    873f:	ff 
+		asm volatile(LOCK_PREFIX "andb %b1,%0"
+    8740:	f0 41 80 a7 9a 02 00 	lock andb $0x7f,0x29a(%r15)
+    8747:	00 7f 
+	dio = f3fs_should_use_dio(inode, iocb, from);
+    8749:	44 0f b6 75 80       	movzbl -0x80(%rbp),%r14d
+	up_write(&inode->i_rwsem);
+    874e:	48 8b 7d 88          	mov    -0x78(%rbp),%rdi
+    8752:	44 88 5d 80          	mov    %r11b,-0x80(%rbp)
+    8756:	e8 00 00 00 00       	call   875b <f3fs_file_write_iter+0x4bb>
+}
+    875b:	44 0f b6 5d 80       	movzbl -0x80(%rbp),%r11d
+    8760:	e9 4b fe ff ff       	jmp    85b0 <f3fs_file_write_iter+0x310>
+	if (iocb_is_dsync(iocb)) {
+    8765:	8b 43 20             	mov    0x20(%rbx),%eax
+	return (iocb->ki_flags & IOCB_DSYNC) ||
+    8768:	48 8b 3b             	mov    (%rbx),%rdi
+    876b:	a8 02                	test   $0x2,%al
+    876d:	0f 84 81 00 00 00    	je     87f4 <f3fs_file_write_iter+0x554>
+				iocb->ki_pos - count, iocb->ki_pos - 1,
+    8773:	48 8b 73 08          	mov    0x8(%rbx),%rsi
+		int ret = vfs_fsync_range(iocb->ki_filp,
+    8777:	31 c9                	xor    %ecx,%ecx
+    8779:	a8 04                	test   $0x4,%al
+    877b:	0f 94 c1             	sete   %cl
+    877e:	48 8d 56 ff          	lea    -0x1(%rsi),%rdx
+    8782:	4c 29 e6             	sub    %r12,%rsi
+    8785:	e8 00 00 00 00       	call   878a <f3fs_file_write_iter+0x4ea>
+			return ret;
+    878a:	48 63 d0             	movslq %eax,%rdx
+    878d:	85 c0                	test   %eax,%eax
+    878f:	4c 0f 45 e2          	cmovne %rdx,%r12
+    8793:	e9 33 fe ff ff       	jmp    85cb <f3fs_file_write_iter+0x32b>
+		f3fs_flush_buffered_write(iocb->ki_filp->f_mapping,
+    8798:	48 8b 03             	mov    (%rbx),%rax
+    879b:	48 8b 4d 98          	mov    -0x68(%rbp),%rcx
+    879f:	4c 8b b0 d8 00 00 00 	mov    0xd8(%rax),%r14
+    87a6:	4e 8d 6c 21 ff       	lea    -0x1(%rcx,%r12,1),%r13
+	ret = filemap_write_and_wait_range(mapping, start_pos, end_pos);
+    87ab:	48 89 ce             	mov    %rcx,%rsi
+    87ae:	48 89 cb             	mov    %rcx,%rbx
+    87b1:	4c 89 ea             	mov    %r13,%rdx
+    87b4:	4c 89 f7             	mov    %r14,%rdi
+    87b7:	e8 00 00 00 00       	call   87bc <f3fs_file_write_iter+0x51c>
+	if (ret < 0)
+    87bc:	85 c0                	test   %eax,%eax
+    87be:	0f 88 1c fe ff ff    	js     85e0 <f3fs_file_write_iter+0x340>
+				 end_pos >> PAGE_SHIFT);
+    87c4:	4c 89 ea             	mov    %r13,%rdx
+				 start_pos >> PAGE_SHIFT,
+    87c7:	48 89 de             	mov    %rbx,%rsi
+	invalidate_mapping_pages(mapping,
+    87ca:	4c 89 f7             	mov    %r14,%rdi
+				 end_pos >> PAGE_SHIFT);
+    87cd:	48 c1 fa 0c          	sar    $0xc,%rdx
+				 start_pos >> PAGE_SHIFT,
+    87d1:	48 c1 fe 0c          	sar    $0xc,%rsi
+	invalidate_mapping_pages(mapping,
+    87d5:	e8 00 00 00 00       	call   87da <f3fs_file_write_iter+0x53a>
+	return tmp;
+    87da:	e9 01 fe ff ff       	jmp    85e0 <f3fs_file_write_iter+0x340>
+	bool may_need_sync = true;
+    87df:	41 bb 01 00 00 00    	mov    $0x1,%r11d
+		ret = -EIO;
+    87e5:	49 c7 c4 fb ff ff ff 	mov    $0xfffffffffffffffb,%r12
+	bool dio = false;
+    87ec:	45 31 f6             	xor    %r14d,%r14d
+    87ef:	e9 bc fd ff ff       	jmp    85b0 <f3fs_file_write_iter+0x310>
+		IS_SYNC(iocb->ki_filp->f_mapping->host);
+    87f4:	48 8b 97 d8 00 00 00 	mov    0xd8(%rdi),%rdx
+    87fb:	48 8b 12             	mov    (%rdx),%rdx
+    87fe:	48 8b 4a 28          	mov    0x28(%rdx),%rcx
+	return (iocb->ki_flags & IOCB_DSYNC) ||
+    8802:	f6 41 50 10          	testb  $0x10,0x50(%rcx)
+    8806:	0f 85 67 ff ff ff    	jne    8773 <f3fs_file_write_iter+0x4d3>
+		IS_SYNC(iocb->ki_filp->f_mapping->host);
+    880c:	f6 42 0c 01          	testb  $0x1,0xc(%rdx)
+    8810:	0f 85 5d ff ff ff    	jne    8773 <f3fs_file_write_iter+0x4d3>
+    8816:	e9 b0 fd ff ff       	jmp    85cb <f3fs_file_write_iter+0x32b>
+		return err;
+    881b:	4c 63 e0             	movslq %eax,%r12
+	if (ret <= 0)
+    881e:	4d 85 e4             	test   %r12,%r12
+    8821:	0f 8f 85 fb ff ff    	jg     83ac <f3fs_file_write_iter+0x10c>
+    8827:	e9 22 ff ff ff       	jmp    874e <f3fs_file_write_iter+0x4ae>
+	bool may_need_sync = true;
+    882c:	41 bb 01 00 00 00    	mov    $0x1,%r11d
+			ret = -EAGAIN;
+    8832:	49 c7 c4 f5 ff ff ff 	mov    $0xfffffffffffffff5,%r12
+	bool dio = false;
+    8839:	45 31 f6             	xor    %r14d,%r14d
+    883c:	e9 6f fd ff ff       	jmp    85b0 <f3fs_file_write_iter+0x310>
+	return sb->s_fs_info;
+    8841:	49 8b 46 28          	mov    0x28(%r14),%rax
+    8845:	48 8b 80 80 03 00 00 	mov    0x380(%rax),%rax
+    884c:	48 89 85 50 ff ff ff 	mov    %rax,-0xb0(%rbp)
+	return F3FS_OPTION(sbi).fs_mode == FS_MODE_LFS;
+    8853:	8b 80 5c 06 00 00    	mov    0x65c(%rax),%eax
+    8859:	89 85 68 ff ff ff    	mov    %eax,-0x98(%rbp)
+	const loff_t pos = iocb->ki_pos;
+    885f:	48 8b 43 08          	mov    0x8(%rbx),%rax
+    8863:	48 89 85 60 ff ff ff 	mov    %rax,-0xa0(%rbp)
+    886a:	49 8b 45 18          	mov    0x18(%r13),%rax
+    886e:	48 89 85 58 ff ff ff 	mov    %rax,-0xa8(%rbp)
+    8875:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+	if (iocb->ki_flags & IOCB_NOWAIT) {
+    887a:	f6 43 20 08          	testb  $0x8,0x20(%rbx)
+    887e:	0f 84 2c 03 00 00    	je     8bb0 <f3fs_file_write_iter+0x910>
+		(addr[nr >> _BITOPS_LONG_SHIFT])) != 0;
+    8884:	49 8b 86 98 02 00 00 	mov    0x298(%r14),%rax
+		if (f3fs_has_inline_data(inode) ||
+    888b:	f6 c4 04             	test   $0x4,%ah
+    888e:	0f 85 d8 05 00 00    	jne    8e6c <f3fs_file_write_iter+0xbcc>
+		    !f3fs_overwrite_io(inode, pos, count)) {
+    8894:	48 8b 95 58 ff ff ff 	mov    -0xa8(%rbp),%rdx
+    889b:	48 8b b5 60 ff ff ff 	mov    -0xa0(%rbp),%rsi
+    88a2:	4c 89 f7             	mov    %r14,%rdi
+    88a5:	4c 89 95 38 ff ff ff 	mov    %r10,-0xc8(%rbp)
+    88ac:	e8 00 00 00 00       	call   88b1 <f3fs_file_write_iter+0x611>
+		if (f3fs_has_inline_data(inode) ||
+    88b1:	84 c0                	test   %al,%al
+    88b3:	88 85 40 ff ff ff    	mov    %al,-0xc0(%rbp)
+    88b9:	0f 84 ad 05 00 00    	je     8e6c <f3fs_file_write_iter+0xbcc>
+	return down_read_trylock(&sem->internal_rwsem);
+    88bf:	49 8d 86 90 03 00 00 	lea    0x390(%r14),%rax
+    88c6:	48 89 c7             	mov    %rax,%rdi
+    88c9:	48 89 85 48 ff ff ff 	mov    %rax,-0xb8(%rbp)
+    88d0:	e8 00 00 00 00       	call   88d5 <f3fs_file_write_iter+0x635>
+		if (!f3fs_down_read_trylock(&fi->i_gc_rwsem[WRITE])) {
+    88d5:	85 c0                	test   %eax,%eax
+    88d7:	0f 84 8f 05 00 00    	je     8e6c <f3fs_file_write_iter+0xbcc>
+		if (do_opu && !f3fs_down_read_trylock(&fi->i_gc_rwsem[READ])) {
+    88dd:	83 bd 68 ff ff ff 01 	cmpl   $0x1,-0x98(%rbp)
+    88e4:	4c 8b 95 38 ff ff ff 	mov    -0xc8(%rbp),%r10
+    88eb:	0f 84 47 04 00 00    	je     8d38 <f3fs_file_write_iter+0xa98>
+    88f1:	4c 89 95 40 ff ff ff 	mov    %r10,-0xc0(%rbp)
+	asm volatile(LOCK_PREFIX "incl %0"
+    88f8:	48 8b 85 50 ff ff ff 	mov    -0xb0(%rbp),%rax
+    88ff:	f0 ff 80 8c 05 00 00 	lock incl 0x58c(%rax)
+	if (pos + count > inode->i_size)
+    8906:	48 8b 85 60 ff ff ff 	mov    -0xa0(%rbp),%rax
+	dio = __iomap_dio_rw(iocb, from, &f3fs_iomap_ops,
+    890d:	41 b9 00 00 00 00    	mov    $0x0,%r9d
+	if (pos + count > inode->i_size)
+    8913:	48 03 85 58 ff ff ff 	add    -0xa8(%rbp),%rax
+	dio = __iomap_dio_rw(iocb, from, &f3fs_iomap_ops,
+    891a:	48 c7 c2 00 00 00 00 	mov    $0x0,%rdx
+	if (pos + count > inode->i_size)
+    8921:	49 3b 46 50          	cmp    0x50(%r14),%rax
+	dio = __iomap_dio_rw(iocb, from, &f3fs_iomap_ops,
+    8925:	6a 00                	push   $0x0
+    8927:	48 c7 c1 00 00 00 00 	mov    $0x0,%rcx
+    892e:	4c 89 ee             	mov    %r13,%rsi
+    8931:	41 0f 9f c0          	setg   %r8b
+    8935:	48 89 df             	mov    %rbx,%rdi
+    8938:	45 0f b6 c0          	movzbl %r8b,%r8d
+    893c:	e8 00 00 00 00       	call   8941 <f3fs_file_write_iter+0x6a1>
+	return unlikely(!ptr) || IS_ERR_VALUE((unsigned long)ptr);
+    8941:	4c 8b 95 40 ff ff ff 	mov    -0xc0(%rbp),%r10
+    8948:	5a                   	pop    %rdx
+    8949:	48 85 c0             	test   %rax,%rax
+    894c:	0f 84 cf 02 00 00    	je     8c21 <f3fs_file_write_iter+0x981>
+    8952:	48 3d 00 f0 ff ff    	cmp    $0xfffffffffffff000,%rax
+    8958:	0f 87 b7 02 00 00    	ja     8c15 <f3fs_file_write_iter+0x975>
+		ret = iomap_dio_complete(dio);
+    895e:	48 89 c7             	mov    %rax,%rdi
+    8961:	4c 89 95 50 ff ff ff 	mov    %r10,-0xb0(%rbp)
+    8968:	e8 00 00 00 00       	call   896d <f3fs_file_write_iter+0x6cd>
+    896d:	4c 8b 95 50 ff ff ff 	mov    -0xb0(%rbp),%r10
+    8974:	49 89 c4             	mov    %rax,%r12
+	if (do_opu)
+    8977:	83 bd 68 ff ff ff 01 	cmpl   $0x1,-0x98(%rbp)
+    897e:	0f 84 95 03 00 00    	je     8d19 <f3fs_file_write_iter+0xa79>
+	up_read(&sem->internal_rwsem);
+    8984:	48 8b bd 48 ff ff ff 	mov    -0xb8(%rbp),%rdi
+    898b:	4c 89 95 50 ff ff ff 	mov    %r10,-0xb0(%rbp)
+    8992:	e8 00 00 00 00       	call   8997 <f3fs_file_write_iter+0x6f7>
+	if (ret < 0)
+    8997:	4d 85 e4             	test   %r12,%r12
+    899a:	4c 8b 95 50 ff ff ff 	mov    -0xb0(%rbp),%r10
+    89a1:	0f 88 fc 01 00 00    	js     8ba3 <f3fs_file_write_iter+0x903>
+	if (pos + ret > inode->i_size)
+    89a7:	48 8b 85 60 ff ff ff 	mov    -0xa0(%rbp),%rax
+    89ae:	4c 01 e0             	add    %r12,%rax
+    89b1:	49 3b 46 50          	cmp    0x50(%r14),%rax
+    89b5:	0f 8f e9 02 00 00    	jg     8ca4 <f3fs_file_write_iter+0xa04>
+	if (!do_opu)
+    89bb:	83 bd 68 ff ff ff 01 	cmpl   $0x1,-0x98(%rbp)
+    89c2:	74 09                	je     89cd <f3fs_file_write_iter+0x72d>
+		asm volatile(LOCK_PREFIX "orb %b1,%0"
+    89c4:	f0 41 80 8e 99 02 00 	lock orb $0x20,0x299(%r14)
+    89cb:	00 20 
+	if (iov_iter_count(from)) {
+    89cd:	49 83 7d 18 00       	cmpq   $0x0,0x18(%r13)
+    89d2:	0f 85 77 01 00 00    	jne    8b4f <f3fs_file_write_iter+0x8af>
+	trace_f3fs_direct_IO_exit(inode, pos, count, WRITE, ret);
+    89d8:	45 89 e1             	mov    %r12d,%r9d
+		*may_need_sync = false;
+    89db:	45 31 db             	xor    %r11d,%r11d
+    89de:	66 90                	xchg   %ax,%ax
+    89e0:	e9 16 fd ff ff       	jmp    86fb <f3fs_file_write_iter+0x45b>
+			f3fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
+    89e5:	48 8b 73 08          	mov    0x8(%rbx),%rsi
+    89e9:	48 8b 55 90          	mov    -0x70(%rbp),%rdx
+    89ed:	4c 89 d7             	mov    %r10,%rdi
+    89f0:	b9 01 00 00 00       	mov    $0x1,%ecx
+    89f5:	e8 06 ba ff ff       	call   4400 <f3fs_trace_rw_file_path>
+	struct file *file = iocb->ki_filp;
+    89fa:	4c 8b 13             	mov    (%rbx),%r10
+    89fd:	e9 9b fc ff ff       	jmp    869d <f3fs_file_write_iter+0x3fd>
+TRACE_EVENT(f3fs_direct_IO_exit,
+    8a02:	65 8b 05 00 00 00 00 	mov    %gs:0x0(%rip),%eax        # 8a09 <f3fs_file_write_iter+0x769>
+					  variable_test_bit(nr, addr);
+    8a09:	89 c0                	mov    %eax,%eax
+	asm volatile(__ASM_SIZE(bt) " %2,%1"
+    8a0b:	48 0f a3 05 00 00 00 	bt     %rax,0x0(%rip)        # 8a13 <f3fs_file_write_iter+0x773>
+    8a12:	00 
+    8a13:	0f 83 e2 fc ff ff    	jae    86fb <f3fs_file_write_iter+0x45b>
+	raw_cpu_add_4(pcpu_hot.preempt_count, val);
+    8a19:	65 ff 05 00 00 00 00 	incl   %gs:0x0(%rip)        # 8a20 <f3fs_file_write_iter+0x780>
+    8a20:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 8a27 <f3fs_file_write_iter+0x787>
+    8a27:	48 85 c0             	test   %rax,%rax
+    8a2a:	74 2f                	je     8a5b <f3fs_file_write_iter+0x7bb>
+    8a2c:	48 8b 78 08          	mov    0x8(%rax),%rdi
+    8a30:	48 8b 8d 58 ff ff ff 	mov    -0xa8(%rbp),%rcx
+    8a37:	41 b8 01 00 00 00    	mov    $0x1,%r8d
+    8a3d:	4c 89 f6             	mov    %r14,%rsi
+    8a40:	48 8b 95 60 ff ff ff 	mov    -0xa0(%rbp),%rdx
+    8a47:	44 88 9d 68 ff ff ff 	mov    %r11b,-0x98(%rbp)
+    8a4e:	e8 00 00 00 00       	call   8a53 <f3fs_file_write_iter+0x7b3>
+    8a53:	44 0f b6 9d 68 ff ff 	movzbl -0x98(%rbp),%r11d
+    8a5a:	ff 
+	return GEN_UNARY_RMWcc("decl", pcpu_hot.preempt_count, e,
+    8a5b:	65 ff 0d 00 00 00 00 	decl   %gs:0x0(%rip)        # 8a62 <f3fs_file_write_iter+0x7c2>
+TRACE_EVENT(f3fs_sync_file_exit,
+    8a62:	0f 85 93 fc ff ff    	jne    86fb <f3fs_file_write_iter+0x45b>
+    8a68:	e8 00 00 00 00       	call   8a6d <f3fs_file_write_iter+0x7cd>
+    8a6d:	e9 89 fc ff ff       	jmp    86fb <f3fs_file_write_iter+0x45b>
+			f3fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
+    8a72:	4c 8b 13             	mov    (%rbx),%r10
+    8a75:	e9 1e fc ff ff       	jmp    8698 <f3fs_file_write_iter+0x3f8>
+    8a7a:	66 90                	xchg   %ax,%ax
+    8a7c:	e9 7f fc ff ff       	jmp    8700 <f3fs_file_write_iter+0x460>
+		pid_t pid, char *pathname, char *command),
+

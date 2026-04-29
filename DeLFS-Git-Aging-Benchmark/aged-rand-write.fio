@@ -1,0 +1,15 @@
+; fio-seq-write.job for fiotest
+[global]
+directory=/mnt/aged
+;filename=/dev/md127
+rw=randwrite
+bs=4K
+direct=0
+numjobs=128
+group_reporting
+time_based=1
+runtime=10m
+
+[file1]
+size=2200MB
+

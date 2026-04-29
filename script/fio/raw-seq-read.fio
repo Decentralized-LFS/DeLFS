@@ -1,0 +1,13 @@
+; fio-seq-read.job for fiotest
+
+[global]
+filename=/dev/nvme8n1p1
+rw=read
+bs=4K
+direct=1
+numjobs=128
+group_reporting
+
+[file1]
+size=2200M
+
