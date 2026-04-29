@@ -21,9 +21,9 @@ cd <path where you installed DeLFS>/DeLFS/DeLFS-Git-Aging-Benchmark/
 
 Usage: percore-delfs2.sh <THREADS> <TOTAL_PULLS> <PULLS_PER_TEST> <AGED_NVME_NUM> <UNAGED_NVME_NUM>
 ```
-$ ./percore-delfs2.sh 128 1000 100 0 2
+$ ./percore-delfs2.sh 128 300 100 0 2
 ```
 Usage: percore-f2fs2.sh <THREADS> <TOTAL_PULLS> <PULLS_PER_TEST> <AGED_NVME_NUM> <UNAGED_NVME_NUM>
 ```
-$ ./percore-f2fs2.sh 128 1000 100 0 2
+$ ./percore-f2fs2.sh 128 300 100 0 2
 ```
